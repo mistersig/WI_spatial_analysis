@@ -7,9 +7,9 @@ Step 1. Collect the data
 Step 2. Run analysis 
 
 
-Step 2a.Nitrate levels should use Spatial Interpolation Inverse Weighted Method (IDW) 
+Step 2a. Nitrate levels should use Spatial Interpolation Inverse Weighted Method (IDW) 
 
-Step 2b.  Aggregated Points(well data ) to cencus tract information 
+Step 2b.  Aggregated Points(well data ) to census tract information 
 
 Step 3b. Once aggregated, SPATIAL REGRESSION to find the relationship.
 
@@ -35,13 +35,34 @@ Matplotlib
 
 
 
+~/.bash_profile
 
-
-
+/Applications/QGIS3.app/Contents/Resources
 
 
 examples
 
 https://www.youtube.com/watch?v=sf4UFPMcOS4&ab_channel=AlexThompson
 
-https://www.youtube.com/watch?v=e4Zx21ulSKU&feature=youtu.be
+cd /path/to/qgis/installation
+
+
+
+
+
+# added by Anaconda3 5.2.0 installer
+#export PATH="/Users/sig/anaconda3/bin:$PATH"
+
+# added by Miniconda3 installer
+#export PATH="/Users/sig/miniconda3/bin:$PATH"
+
+# Setting PATH for Python 3.7
+# The original version is saved in .bash_profile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/3.7/bin:${PATH}"
+export PATH
+
+# Setting PATH for Python 3.6
+# The original version is saved in .bash_profile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/3.6/bin:${PATH}"
+export PATH
+~               
