@@ -12,41 +12,49 @@ import os
 #######################################################################################
 #######################################################################################
 
-wPath = '/Users/sig/projects/geospatialProject1/data/files/well_nitrate/'
-wFile = 'well_nitrate.shp'
+# wPath = '/Users/Sigfrido/Documents/project1/geospatialProject1/data/files/well_nitrate/'
+wPath = os.path.abspath('data/files/well_nitrate')
+# print(wPath)
+wFile = '/well_nitrate.shp'
 #well shape 
 wellNitrate = wPath + wFile
-
+print(wellNitrate)
 
 #currently has both cancer and NITRATE AGGS
-cPath = '/Users/sig/projects/geospatialProject1/data/files/cancer_tracts/'
-cFile ='cancer_tracts.shp'
+cPath = os.path.abspath('data/files/cancer_tracts')
+cFile ='/cancer_tracts.shp'
 #cancer Shape
 cancerTract = cPath + cFile
 
 #outPut
-oPath ='/Users/sig/projects/geospatialProject1/data/outFiles/'
-oTiff = 'test.tiff'
+oPath =os.path.abspath('data/outFiles')
+oTiff = '/test.tiff'
 #rasterOutput IDW
 wIDWresult = oPath + oTiff
 #Raster2Polygon
-rPolyShape= 'wellsPolygon.shp'
+rPolyShape= '/wellsPolygon.shp'
 #raster2CSV
-cPolyShape= 'wellsPoint.csv'
+cPolyShape= '/wellsPoint.csv'
 #csv2pointsShape
-pPolyShape= 'wellsPoints.shp'
+pPolyShape= '/wellsPoints.shp'
 #Polygon Results 
 pResults = oPath + rPolyShape
 #CSVresults
 cResults = oPath + cPolyShape
 #csv2Points 
 shpPntResults = oPath + pPolyShape
+
+
+linearOutput = 'Linear.shp'
+
+lRegression = oPath + linearOutput
 #######################################################################################
 #######################################################################################
 #######################################################################################
 
 
 file = ogr.Open(wellNitrate)
+# print(file)
 shape = file.GetLayer(0)
 #first feature of the shapefile
 feature = shape.GetFeature(0)
@@ -85,30 +93,14 @@ out = gdal.Grid(wIDWresult, #results
                     wellNitrate, #shapefile
                     options=option) #options
 
-out.FlushCache()
+# out.FlushCache()
 out = None
 del out
 
 #######################################################################################
 #######################################################################################
 #######################################################################################
-#1.b convert the Tiff into a shapefile
 
-# srcRaster = gdal.Open(wIDWresult)
-# srcband=srcRaster.GetRasterBand(1)
-
-# drv = ogr.GetDriverByName("ESRI Shapefile")
-# dst_ds = drv.CreateDataSource(pResults)
-# dst_layer = dst_ds.CreateLayer(pResults, srs = None)
-
-# newField = ogr.FieldDefn('NitrateLevels', ogr.OFTInteger)
-# dst_layer.CreateField(newField)
-
-# polygon = gdal.Polygonize(srcband,None, dst_layer, 0, [], callback=None)
-
-# # polygon.FlushCache()
-# polygon = None
-# del polygon
 
 #convert to a CSV
 os.system("gdal_translate -of xyz -co ADD_HEADER_LINE=YES -co COLUMN_SEPARATOR=',' {0} {1}".format(wIDWresult,cResults))
@@ -143,7 +135,7 @@ with collection( shpPntResults, "w", "ESRI Shapefile", schema) as output:
 cancerFile = gpd.read_file(cancerTract)
 
 wellPointsShape = gpd.read_file(shpPntResults)
-#print(wellPointsShape.head())
+#print(wellPointsShape.head())`
 
 cancerFile.crs = wellPointsShape.crs
 
@@ -153,13 +145,32 @@ wellPointsShape= wellPointsShape.rename(columns={'Z': 'NewNitrate'})
 #print(wellPointsShape.head())
 
 
-join = gpd.sjoin(wellPointsShape,cancerFile, how="inner", op="within")
+# join = gpd.sjoin(wellPointsShape,cancerFile, how="inner", op="contains")
+
+# join = gpd.sjoin(cancerFile, wellPointsShape, how="inner", op="within")
+#original
+# join = gpd.sjoin( wellPointsShape, cancerFile, how="inner", op="contains")
 
 
+
+
+join = gpd.sjoin(cancerFile, wellPointsShape, how="left")
 print(join.head())
 
+# import geopandas
+# from geopandas.tools import sjoin
+# point = geopandas.GeoDataFrame.from_file('point.shp') # or geojson etc
+# poly = geopandas.GeoDataFrame.from_file('poly.shp')
+# pointInPolys = sjoin(point, poly, how='left')
+# pointSumByPoly = pointInPolys.groupby('PolyGroupByField')['fields', 'in', 'grouped', 'output'].agg(['sum'])
 
 
+# Output path
+#outfp = lRegression
+
+# Save to disk
+join.to_file(lRegression)
+print('DONE!!!!!!!!!!!!')
 
 #######################################################################################
 #######################################################################################
